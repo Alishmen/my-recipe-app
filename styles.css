@@ -1,0 +1,104 @@
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 840px;
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+}
+
+.container-fix {
+    min-height: 880px;
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none;
+}
+
+.category-options, .product-items, .action-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.category-option, .product-item, .action-item {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: all 0.3s;
+}
+
+.category-option:hover, .product-item:hover, .action-item:hover {
+    background-color: #e0e0e0;
+}
+
+.selected {
+    /* border: 2px solid #007bff; */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+#selected-recipe {
+    margin-top: 20px;
+}
+
+#recipe-text {
+    font-style: italic;
+    color: #555;
+}
+
+#add-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#add-button:hover {
+    background-color: #0056b3;
+}
+
+#recipe-steps {
+    display: flex;
+    margin-top: 20px;
+    white-space: nowrap; /* Текст в одну строку */
+    overflow-x: auto; /* Горизонтальная прокрутка, если текст не помещается */
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    /* border-radius: 5px; */
+    background-color: #f9f9f9;
+    user-select: text; /* Позволяет выделять текст */
+}
+
+.category-option img {
+    width: 100px;
+    height: 100px;
+    border-radius: 5px;
+}

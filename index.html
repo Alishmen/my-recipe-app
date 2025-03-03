@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Рецепт</title>
+</head>
+<body>
+    <div class="container container-fix">
+        <div id="saved-recipes-section">
+            <h2>Сохраненные рецепты</h2>
+            <div id="saved-recipes"></div>
+            <div class="load-recipe">
+                <input type="number" id="load-key-input" placeholder="Введите ключ для загрузки">
+                <button id="load-button">Загрузить рецепт</button>
+                <div id="loaded-recipe"></div>
+            </div>
+        </div>
+        <div id="category-select">
+            <h1>Создание рецепта</h1>
+            <h2>Выберите категорию</h2>
+            <div class="category-options">
+                <!-- Категории будут добавлены сюда -->
+            </div>
+        </div>
+
+        <div id="product-select" class="hidden">
+            <h2>Выберите продукт</h2>
+            <div class="product-items">
+                <!-- Продукты будут добавлены сюда -->
+            </div>
+        </div>
+
+        <div id="action-select" class="hidden">
+            <h2>Выберите действие</h2>
+            <div class="action-items">
+                <!-- Действия будут добавлены сюда -->
+            </div>
+            <div id="selected-recipe" class="hidden">
+                <h3>Рецепт:</h3>
+                <p id="recipe-text"></p>
+            </div>
+            <button id="add-button" class="hidden">Добавить в рецепт</button>
+        </div>
+
+        <div id="recipe" class="hidden">
+            <h2>Ваш рецепт:</h2>
+            <p id="recipe-steps"></p>
+            <div class="recipe-buttons">
+                <!-- Инпут для ввода ключа при сохранении рецепта -->
+                <input type="number" id="save-key-input" placeholder="Введите ключ">
+                <button id="save-button" class="hidden">Сохранить рецепт</button>
+                <button id="clear-button" class="hidden">Очистить рецепт</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
