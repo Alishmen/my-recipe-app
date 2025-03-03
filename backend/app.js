@@ -76,6 +76,17 @@ app.get('/api/recipes/key/:key', (req, res) => {
     });
 });
 
+// Эндпоинт для очистки базы данных по URL /recipe-clean
+app.get('/recipe-clean', (req, res) => {
+    db.run("DELETE FROM recipes", function(err) {
+        if (err) {
+            res.status(500).send(`Ошибка очистки базы данных: ${err.message}`);
+            return;
+        }
+        res.send("База данных очищена");
+    });
+});
+
 app.listen(port, () => {
     console.log(`Сервер запущен на http://localhost:${port}`);
 });
