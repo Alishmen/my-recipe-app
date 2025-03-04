@@ -11,28 +11,95 @@ function loadCSV() {
         .then(text => {
             csvData = parseCSV(text);
             showCategorySelect();
+
         })
         .catch(error => console.error('Ошибка загрузки CSV:', error));
+
 }
 
-// Функция для парсинга CSV
+// // Функция для парсинга CSV
+// function parseCSV(text) {
+//     const lines = text.split('\n');
+//     const result = [];
+//     for (let line of lines) {
+//         console.log(line);
+//         const items = line.split(';').map(item => item.trim());
+//         if (items.length === 5) { // Проверяем, что строка содержит 5 столбцов
+//             result.push({
+//                 category: items[0],
+//                 product: items[1],
+//                 action: items[2],
+//                 description: items[3],
+//                 code: items[4]
+//             });
+//         }
+//     }
+//     return result;
+// }
 function parseCSV(text) {
-    const lines = text.split('\n');
     const result = [];
-    for (let line of lines) {
-        const items = line.split(';').map(item => item.trim());
-        if (items.length === 5) { // Проверяем, что строка содержит 5 столбцов
+    let row = [];
+    let field = "";
+    let inQuotes = false;
+  
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+      
+        if (char === '"') {
+            // Если встречаем двойную кавычку внутри кавычек, проверяем экранирование (две подряд)
+            if (inQuotes && text[i + 1] === '"') {
+                field += '"';
+                i++; // пропускаем следующую кавычку
+            } else {
+                // переключаем состояние кавычек
+                inQuotes = !inQuotes;
+            }
+        } else if (char === ';' && !inQuotes) {
+            // Разделитель поля вне кавычек
+            row.push(field.trim());
+            field = "";
+        } else if ((char === "\n" || char === "\r") && !inQuotes) {
+            // Если встречен перевод строки вне кавычек, значит строка завершена
+            // Для обработки CRLF (\r\n) пропускаем лишний символ
+            if (char === "\r" && text[i + 1] === "\n") {
+                i++;
+            }
+            row.push(field.trim());
+            // Если количество полей соответствует ожидаемому (например, 5)
+            if (row.length === 5) {
+                result.push({
+                    category: row[0],
+                    product: row[1],
+                    action: row[2],
+                    description: row[3],
+                    code: row[4]
+                });
+            }
+            row = [];
+            field = "";
+        } else {
+            // Обычный символ добавляем к текущему полю
+            field += char;
+        }
+    }
+  
+    // Обработка последней строки, если файл не оканчивается переводом строки
+    if (field !== "" || row.length > 0) {
+        row.push(field.trim());
+        if (row.length === 5) {
             result.push({
-                category: items[0],
-                product: items[1],
-                action: items[2],
-                description: items[3],
-                code: items[4]
+                category: row[0],
+                product: row[1],
+                action: row[2],
+                description: row[3],
+                code: row[4]
             });
         }
     }
+  
     return result;
 }
+
 
 // Показать выбор категории
 function showCategorySelect() {
