@@ -17,89 +17,86 @@ function loadCSV() {
 
 }
 
-// // Функция для парсинга CSV
-// function parseCSV(text) {
-//     const lines = text.split('\n');
-//     const result = [];
-//     for (let line of lines) {
-//         console.log(line);
-//         const items = line.split(';').map(item => item.trim());
-//         if (items.length === 5) { // Проверяем, что строка содержит 5 столбцов
-//             result.push({
-//                 category: items[0],
-//                 product: items[1],
-//                 action: items[2],
-//                 description: items[3],
-//                 code: items[4]
-//             });
-//         }
-//     }
-//     return result;
-// }
 function parseCSV(text) {
     const result = [];
-    let row = [];
-    let field = "";
-    let inQuotes = false;
-  
+    
+    let row = [];       // Текущая строка (массив из 5 полей)
+    let field = "";     // Текущее накапливаемое значение поля
+    let inQuotes = false;  // Флаг "мы сейчас внутри кавычек?"
+    
     for (let i = 0; i < text.length; i++) {
-        const char = text[i];
+      const char = text[i];
       
-        if (char === '"') {
-            // Если встречаем двойную кавычку внутри кавычек, проверяем экранирование (две подряд)
-            if (inQuotes && text[i + 1] === '"') {
-                field += '"';
-                i++; // пропускаем следующую кавычку
-            } else {
-                // переключаем состояние кавычек
-                inQuotes = !inQuotes;
-            }
-        } else if (char === ';' && !inQuotes) {
-            // Разделитель поля вне кавычек
-            row.push(field.trim());
-            field = "";
-        } else if ((char === "\n" || char === "\r") && !inQuotes) {
-            // Если встречен перевод строки вне кавычек, значит строка завершена
-            // Для обработки CRLF (\r\n) пропускаем лишний символ
-            if (char === "\r" && text[i + 1] === "\n") {
-                i++;
-            }
-            row.push(field.trim());
-            // Если количество полей соответствует ожидаемому (например, 5)
-            if (row.length === 5) {
-                result.push({
-                    category: row[0],
-                    product: row[1],
-                    action: row[2],
-                    description: row[3],
-                    code: row[4]
-                });
-            }
-            row = [];
-            field = "";
+      // Проверяем кавычку
+      if (char === '"') {
+        // Если внутри кавычек и следующая тоже кавычка => это экранированная "
+        if (inQuotes && i + 1 < text.length && text[i + 1] === '"') {
+          field += '"'; // Добавляем в поле саму кавычку
+          i++;          // Пропускаем следующую кавычку
         } else {
-            // Обычный символ добавляем к текущему полю
-            field += char;
+          // Переключаем состояние inQuotes
+          inQuotes = !inQuotes;
         }
-    }
-  
-    // Обработка последней строки, если файл не оканчивается переводом строки
-    if (field !== "" || row.length > 0) {
-        row.push(field.trim());
+      }
+      // Если встречаем запятую вне кавычек -> это граница поля
+      else if (char === ',' && !inQuotes) {
+        row.push(field);
+        field = "";
+      }
+      // Если встречаем перенос строки (LF или CRLF) вне кавычек -> это граница записи
+      else if ((char === '\n' || char === '\r') && !inQuotes) {
+        // Если это \r и за ним \n - пропустим \n
+        if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') {
+          i++;
+        }
+        // Закрываем текущее поле
+        row.push(field);
+        field = "";
+        // Сохраняем (если длина соответствует количеству полей)
+        // Или можно не проверять, а просто добавлять
         if (row.length === 5) {
-            result.push({
-                category: row[0],
-                product: row[1],
-                action: row[2],
-                description: row[3],
-                code: row[4]
-            });
+          result.push({
+            category:    row[0],
+            product:     row[1],
+            action:      row[2],
+            description: row[3],
+            code:        row[4],
+          });
+        } else {
+          // Можете добавить свою логику — что делать, если не 5 полей
+          // (напр. пропустить или сохранить всё как есть)
+          // console.warn("Found row with", row.length, "fields:", row);
         }
+        // Обнуляем row
+        row = [];
+      }
+      // Обычный символ (просто добавляем в field)
+      else {
+        field += char;
+      }
     }
-  
+    
+    // Если в конце строки не было переноса (или файл не заканчивается переносом) —
+    // обрабатываем "хвост" (последнюю запись)
+    if (field.length > 0 || row.length > 0) {
+      row.push(field);
+      if (row.length === 5) {
+        result.push({
+          category:    row[0],
+          product:     row[1],
+          action:      row[2],
+          description: row[3],
+          code:        row[4],
+        });
+      } else {
+        // console.warn("Found row with", row.length, "fields at the end:", row);
+      }
+    }
+    
     return result;
 }
-
+  
+  
 
 // Показать выбор категории
 function showCategorySelect() {
@@ -209,7 +206,7 @@ function showRecipeText(category, product, action) {
     }
 }
 
-// Обработчик для добавления шага в рецепт
+// Обработчик для добавления шага в рецепт старый обработчик
 document.getElementById('add-button').addEventListener('click', () => {
     const selectedData = csvData.find(item => 
         item.category === selectedCategory &&
@@ -220,9 +217,9 @@ document.getElementById('add-button').addEventListener('click', () => {
     if (selectedData) {
         const recipeSteps = document.getElementById('recipe-steps');
         if (recipeSteps.textContent === '') {
-            recipeSteps.textContent = ` ${stepCounter}. ${selectedData.code}`;
+            recipeSteps.textContent = `${stepCounter})${selectedData.code}`;
         } else {
-            recipeSteps.textContent += ` ) ${stepCounter}. ${selectedData.code}`;
+            recipeSteps.textContent += ` ${stepCounter})${selectedData.code}`;
         }
         stepCounter++;
         // Показываем блок рецепта и кнопки "Сохранить рецепт" и "Очистить рецепт"
@@ -232,6 +229,7 @@ document.getElementById('add-button').addEventListener('click', () => {
         resetSelection();
     }
 });
+
 
 // // Обработчик для кнопки "Сохранить рецепт"
 document.getElementById('save-button').addEventListener('click', () => {
